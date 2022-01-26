@@ -8,6 +8,8 @@
 
 using namespace std::chrono_literals;
 
+#define eval_interval 100ms
+
 /* This example creates a subclass of Node and uses std::bind() to register a
 * member function as a callback from the timer. */
 
@@ -19,7 +21,7 @@ class MinimalPublisher : public rclcpp::Node
     {
       publisher_ = this->create_publisher<std_msgs::msg::String>("testtopic", 10);
       timer_ = this->create_wall_timer(
-      500ms, std::bind(&MinimalPublisher::timer_callback, this));
+      eval_interval, std::bind(&MinimalPublisher::timer_callback, this));
     }
 
   private:
