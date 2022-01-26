@@ -12,6 +12,7 @@ using namespace std::chrono_literals;
 
 /* definition for evaluation */
 #define eval_interval 100ms
+#define sleep_before_pub_end 5000ms
 #define num_comm 10
 
 int str_length;
@@ -71,7 +72,7 @@ private:
     count_++;
     if (count_ >= num_comm)
     {
-      rclcpp::sleep_for(1000ms);
+      rclcpp::sleep_for(sleep_before_pub_end);
       auto end_message = std_msgs::msg::String();
       end_message.data = "end";
       publisher_->publish(end_message);
