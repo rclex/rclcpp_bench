@@ -10,7 +10,10 @@
 
 using namespace std::chrono_literals;
 
+/* definition for evaluation */
 #define eval_interval 100ms
+
+#define num_comm 10
 
 int str_length;
 
@@ -55,9 +58,19 @@ private:
   void timer_callback()
   {
     auto message = std_msgs::msg::String();
-    message.data = std::to_string(count_++) + Random_String::get_random_string(str_length);
+    message.data = Random_String::get_random_string(str_length);
     RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
     publisher_->publish(message);
+
+    count_++;
+    if (count_ >= num_comm)
+    {
+      rclcpp::sleep_for(1000ms);
+      auto end_message = std_msgs::msg::String();
+      end_message.data = "end";
+      publisher_->publish(end_message);
+      rclcpp::shutdown();
+    }
   }
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
