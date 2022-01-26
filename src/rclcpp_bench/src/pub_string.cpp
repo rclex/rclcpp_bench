@@ -60,8 +60,11 @@ private:
     auto message = std_msgs::msg::String();
     message.data = Random_String::get_random_string(str_length);
     RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
+
+    auto now = std::chrono::system_clock::now();
     publisher_->publish(message);
 
+    RCLCPP_INFO(this->get_logger(), "clock: %ld", now);
     count_++;
     if (count_ >= num_comm)
     {
@@ -88,6 +91,7 @@ int main(int argc, char *argv[])
   str_length = atoi(argv[2]);
 
   rclcpp::init(argc, argv);
+
   rclcpp::spin(std::make_shared<MinimalPublisher>());
   rclcpp::shutdown();
   return 0;

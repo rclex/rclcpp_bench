@@ -19,6 +19,7 @@ public:
 private:
   void topic_callback(const std_msgs::msg::String::SharedPtr msg) const
   {
+    auto now = std::chrono::system_clock::now();
     RCLCPP_INFO(this->get_logger(), "I heard: '%s'", msg->data.c_str());
 
     std::string msg_string = msg->data.c_str();
@@ -26,6 +27,10 @@ private:
     {
       rclcpp::sleep_for(1000ms);
       rclcpp::shutdown();
+    }
+    else
+    {
+      RCLCPP_INFO(this->get_logger(), "clock: %ld", now);
     }
   }
   rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
