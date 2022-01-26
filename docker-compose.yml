@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  rclex_docker:
+    build: .
+    image: rclex/rclex_docker:latest  # foxy-ex1.12.3-otp24.1.5
+    volumes:
+      - .:/root/rclcpp_bench/
+    working_dir: /root/rclcpp_bench
+    environment:
+      - ERL_AFLAGS=-kernel shell_history enabled
+    tty: true
