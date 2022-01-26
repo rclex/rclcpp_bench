@@ -11,7 +11,7 @@
 using namespace std::chrono_literals;
 
 /* definition for evaluation */
-#define eval_interval 100ms
+#define eval_interval 1000ms
 #define sleep_before_pub_end 5000ms
 #define num_comm 10
 
