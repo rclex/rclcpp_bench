@@ -53,8 +53,8 @@ while [ ${CUR_STR_LENGTH} -le ${MAX_STR_LENGTH} ]; do
 
   wait $PID_SUB $PID_PUB
 
-  #CMD="mix run -e 'RclexBench.Utils.aggregation_csv(\"${FILE_PUB}\", \"${FILE_SUB}\", \"${FILE_TIM}\")'"
-  #eval ${CMD} ;
+  CMD="elixir scripts/aggregation_csv.exs ${FILE_PUB} ${FILE_SUB} ${FILE_TIM}"
+  eval ${CMD} ;
 
   CUR_STR_LENGTH=$((${CUR_STR_LENGTH} * 2))
 done
