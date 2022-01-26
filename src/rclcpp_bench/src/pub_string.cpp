@@ -2,20 +2,20 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <sys/time.h>
+#include <fstream>
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
-
-#include <sys/time.h>
 
 using namespace std::chrono_literals;
 
 /* definition for evaluation */
 #define eval_interval 100ms
-
 #define num_comm 10
 
 int str_length;
+std::vector<std::string> results;
 
 class Random_String
 {
@@ -59,12 +59,15 @@ private:
   {
     auto message = std_msgs::msg::String();
     message.data = Random_String::get_random_string(str_length);
-    RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
+    //RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
 
-    auto now = std::chrono::system_clock::now();
+    auto result = std::chrono::system_clock::now();
     publisher_->publish(message);
 
-    RCLCPP_INFO(this->get_logger(), "clock: %ld", now);
+    //RCLCPP_INFO(this->get_logger(), "clock: %ld", result);
+    auto result_us = std::chrono::duration_cast<std::chrono::microseconds>(result.time_since_epoch()).count();
+    results.emplace_back(message.data + "," + std::to_string(result_us));
+
     count_++;
     if (count_ >= num_comm)
     {
@@ -94,5 +97,12 @@ int main(int argc, char *argv[])
 
   rclcpp::spin(std::make_shared<MinimalPublisher>());
   rclcpp::shutdown();
+
+  std::ofstream ofs(filename);
+  for (size_t i = 0; i < results.size(); ++i)
+  {
+    ofs << results.at(i) << std::endl;
+  }
+
   return 0;
 }
