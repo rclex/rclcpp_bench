@@ -24,7 +24,7 @@ VERSION=$1
 
 # Re-compile benchmark.
 #rm -rf build/ install/ log/
-colcon build
+colcon build --symlink-install
 if [ $? -ne 0 ]; then
   echo "Error: colcon build failed"
   exit 1
@@ -85,7 +85,7 @@ while [ ${CUR_STR_LENGTH} -le ${MAX_STR_LENGTH} ]; do
   # Wait a while.
   sleep ${SUB_PUB_INTERVAL}
 
-  CMD="ros2 launch rclcpp_bench str${CUR_STR_LENGTH}pub${NUM_PUB}.launch.py"
+  CMD="ros2 launch rclcpp_bench pub${NUM_PUB}str${CUR_STR_LENGTH}.launch.py"
   eval ${CMD} &
   PID_PUB=$!
 

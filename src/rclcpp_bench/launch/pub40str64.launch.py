@@ -1,8 +1,8 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
-str_length = '64'
 num_pub = '40'
+str_length = '64'
 
 
 def generate_launch_description():
