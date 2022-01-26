@@ -34,7 +34,7 @@ source install/local_setup.bash
 # Pub1 : Sub1 test.
 CUR_STR_LENGTH=${INI_STR_LENGTH}
 
-while [ ${CUR_STR_LENGTH} -le ${MAX_STR_LENGTH} ]; do
+while [ ${CUR_STR_LENGTH} -ge ${MAX_STR_LENGTH} ]; do
   FILEPATH="./results/string/p1s1/${CUR_STR_LENGTH}"
   FILE_PUB="${FILEPATH}/pub.csv"
   FILE_SUB="${FILEPATH}/sub.csv"
@@ -66,7 +66,7 @@ done
 # PubN : Sub1 test.
 CUR_STR_LENGTH=${INI_STR_LENGTH}
 
-while [ ${CUR_STR_LENGTH} -le ${MAX_STR_LENGTH} ]; do
+while [ ${CUR_STR_LENGTH} -ge ${MAX_STR_LENGTH} ]; do
   NUM_PUB=${INI_NUM_NODES}
 
   while [ ${NUM_PUB} -le ${MAX_NUM_NODES} ]; do
@@ -110,35 +110,50 @@ while [ ${CUR_STR_LENGTH} -le ${MAX_STR_LENGTH} ]; do
   CUR_STR_LENGTH=$((${CUR_STR_LENGTH} * 2))
 done
 
-exit 0
 
 # Pub1 : SubN test.
 CUR_STR_LENGTH=${INI_STR_LENGTH}
 
 while [ ${CUR_STR_LENGTH} -le ${MAX_STR_LENGTH} ]; do
-  NUM_PUB=1
   NUM_SUB=${INI_NUM_NODES}
+
   while [ ${NUM_SUB} -le ${MAX_NUM_NODES} ]; do
-  FILEPATH="./results/string/p1sN/${VERSION}/${CUR_STR_LENGTH}/${NUM_SUB}"
+  FILEPATH="./results/string/p1sN/${CUR_STR_LENGTH}/${NUM_SUB}"
   FILE_PUB="${FILEPATH}/pub.csv"
   FILE_SUB="${FILEPATH}/sub.csv"
   FILE_TIM="${FILEPATH}/time.csv"
   mkdir -p ${FILEPATH}
   
-  CMD="mix run -e 'RclexBench.StringTopic.sub_main(\"${FILE_SUB}\", ${NUM_SUB})'"
+  CMD="ros2 launch rclcpp_bench sub${NUM_SUB}str${CUR_STR_LENGTH}.launch.py"
   eval ${CMD} &
   PID_SUB=$!
 
   # Wait a while.
   sleep ${SUB_PUB_INTERVAL}
 
-  CMD="mix run -e 'RclexBench.StringTopic.pub_main(\"${FILE_PUB}\", ${NUM_PUB}, ${CUR_STR_LENGTH}, ${NUM_COMM})'"
+  CMD="ros2 run rclcpp_bench pub_string ${FILE_PUB} ${CUR_STR_LENGTH}"
   eval ${CMD} &
   PID_PUB=$!
 
-  wait $PID_SUB $PID_PUB
+  # It is hard to finalize ros2_launch process for sN
+  #wait $PID_SUB $PID_PUB
+  wait $PID_PUB
+  sleep 10
+  kill $PID_SUB
+  sleep 10
 
-  CMD="mix run -e 'RclexBench.Utils.aggregation_csv(\"${FILE_PUB}\", \"${FILE_SUB}\", \"${FILE_TIM}\")'"
+  rm -f ${FILE_SUB}
+  NUM=0
+  while [ ${NUM} -lt 10 ]; do
+    cat ${FILEPATH}/sub0${NUM}.csv >> ${FILE_SUB}
+    NUM=$((${NUM} + 1))
+  done
+  while [ ${NUM} -lt ${NUM_SUB} ]; do
+    cat ${FILEPATH}/sub${NUM}.csv >> ${FILE_SUB}
+    NUM=$((${NUM} + 1))
+  done
+
+  CMD="elixir scripts/aggregation_csv.exs ${FILE_PUB} ${FILE_SUB} ${FILE_TIM}"
   eval ${CMD} ;
 
   NUM_SUB=$((${NUM_SUB} + 20))
