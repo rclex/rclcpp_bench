@@ -86,11 +86,6 @@ private:
 
 int main(int argc, char *argv[])
 {
-  if (argc != 3)
-  {
-    printf("arguments are needed %d\n", argc);
-    return 1;
-  }
   std::string filename = argv[1];
   str_length = atoi(argv[2]);
 
