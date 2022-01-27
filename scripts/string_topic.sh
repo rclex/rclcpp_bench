@@ -139,7 +139,9 @@ while [ ${CUR_STR_LENGTH} -le ${MAX_STR_LENGTH} ]; do
   #wait $PID_SUB $PID_PUB
   wait $PID_PUB
   sleep 10
-  kill $PID_SUB
+  kill -9 $PID_SUB
+  ps aux | grep sub_string | grep -v grep | awk '{ print "kill -9", $2 }' | sh
+  ps aux | grep ros2 | grep -v grep | awk '{ print "kill -9", $2 }' | sh
   sleep 10
 
   rm -f ${FILE_SUB}
