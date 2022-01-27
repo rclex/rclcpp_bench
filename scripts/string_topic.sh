@@ -20,8 +20,6 @@ if [ $# != 0 ]; then
   exit 1
 fi
 
-VERSION=$1
-
 # Re-compile benchmark.
 #rm -rf build/ install/ log/
 colcon build --symlink-install
@@ -34,7 +32,7 @@ source install/local_setup.bash
 # Pub1 : Sub1 test.
 CUR_STR_LENGTH=${INI_STR_LENGTH}
 
-while [ ${CUR_STR_LENGTH} -ge ${MAX_STR_LENGTH} ]; do
+while [ ${CUR_STR_LENGTH} -le ${MAX_STR_LENGTH} ]; do
   FILEPATH="./results/string/p1s1/${CUR_STR_LENGTH}"
   FILE_PUB="${FILEPATH}/pub.csv"
   FILE_SUB="${FILEPATH}/sub.csv"
@@ -66,7 +64,7 @@ done
 # PubN : Sub1 test.
 CUR_STR_LENGTH=${INI_STR_LENGTH}
 
-while [ ${CUR_STR_LENGTH} -ge ${MAX_STR_LENGTH} ]; do
+while [ ${CUR_STR_LENGTH} -le ${MAX_STR_LENGTH} ]; do
   NUM_PUB=${INI_NUM_NODES}
 
   while [ ${NUM_PUB} -le ${MAX_NUM_NODES} ]; do
