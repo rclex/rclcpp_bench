@@ -11,7 +11,8 @@
 using namespace std::chrono_literals;
 
 /* definition for evaluation */
-#define eval_interval 100ms
+#define eval_interval 1000ms
+#define sleep_before_pub_end 5000ms
 #define num_comm 10
 
 int str_length;
@@ -57,24 +58,28 @@ public:
 private:
   void timer_callback()
   {
-    auto message = std_msgs::msg::String();
-    message.data = Random_String::get_random_string(str_length);
-    //RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
-
-    auto result = std::chrono::system_clock::now();
-    publisher_->publish(message);
-
-    //RCLCPP_INFO(this->get_logger(), "clock: %ld", result);
-    auto result_us = std::chrono::duration_cast<std::chrono::microseconds>(result.time_since_epoch()).count();
-    results.emplace_back(message.data + "," + std::to_string(result_us));
-
-    count_++;
-    if (count_ >= num_comm)
+    if (count_ < num_comm)
     {
-      rclcpp::sleep_for(1000ms);
+      auto message = std_msgs::msg::String();
+      message.data = Random_String::get_random_string(str_length);
+      //RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
+
+      auto result = std::chrono::system_clock::now();
+      publisher_->publish(message);
+
+      //RCLCPP_INFO(this->get_logger(), "clock: %ld", result);
+      auto result_us = std::chrono::duration_cast<std::chrono::microseconds>(result.time_since_epoch()).count();
+      results.emplace_back(message.data + "," + std::to_string(result_us));
+
+      count_++;
+    }
+    else
+    {
+      rclcpp::sleep_for(sleep_before_pub_end);
       auto end_message = std_msgs::msg::String();
       end_message.data = "end";
       publisher_->publish(end_message);
+      rclcpp::sleep_for(sleep_before_pub_end);
       rclcpp::shutdown();
     }
   }
@@ -85,11 +90,6 @@ private:
 
 int main(int argc, char *argv[])
 {
-  if (argc != 3)
-  {
-    printf("arguments are needed %d\n", argc);
-    return 1;
-  }
   std::string filename = argv[1];
   str_length = atoi(argv[2]);
 
