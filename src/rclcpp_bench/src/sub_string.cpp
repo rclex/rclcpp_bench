@@ -7,6 +7,9 @@ using std::placeholders::_1;
 
 using namespace std::chrono_literals;
 
+/* definition for evaluation */
+#define sleep_before_pub_end 5000ms
+
 std::vector<std::string> results;
 
 class MinimalSubscriber : public rclcpp::Node
@@ -28,7 +31,7 @@ private:
     std::string msg_string = msg->data.c_str();
     if (msg_string == "end")
     {
-      rclcpp::sleep_for(1000ms);
+      rclcpp::sleep_for(sleep_before_pub_end);
       rclcpp::shutdown();
     }
     else

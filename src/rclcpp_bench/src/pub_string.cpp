@@ -58,24 +58,28 @@ public:
 private:
   void timer_callback()
   {
-    auto message = std_msgs::msg::String();
-    message.data = Random_String::get_random_string(str_length);
-    //RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
+    if (count_ < num_comm)
+    {
+      auto message = std_msgs::msg::String();
+      message.data = Random_String::get_random_string(str_length);
+      //RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
 
-    auto result = std::chrono::system_clock::now();
-    publisher_->publish(message);
+      auto result = std::chrono::system_clock::now();
+      publisher_->publish(message);
 
-    //RCLCPP_INFO(this->get_logger(), "clock: %ld", result);
-    auto result_us = std::chrono::duration_cast<std::chrono::microseconds>(result.time_since_epoch()).count();
-    results.emplace_back(message.data + "," + std::to_string(result_us));
+      //RCLCPP_INFO(this->get_logger(), "clock: %ld", result);
+      auto result_us = std::chrono::duration_cast<std::chrono::microseconds>(result.time_since_epoch()).count();
+      results.emplace_back(message.data + "," + std::to_string(result_us));
 
-    count_++;
-    if (count_ >= num_comm)
+      count_++;
+    }
+    else
     {
       rclcpp::sleep_for(sleep_before_pub_end);
       auto end_message = std_msgs::msg::String();
       end_message.data = "end";
       publisher_->publish(end_message);
+      rclcpp::sleep_for(sleep_before_pub_end);
       rclcpp::shutdown();
     }
   }
